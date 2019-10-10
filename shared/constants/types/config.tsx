@@ -55,7 +55,6 @@ export type State = {
   httpSrvAddress: string
   httpSrvToken: string
   justDeletedSelf: string
-  lastSeenVersion: string
   loggedIn: boolean
   logoutHandshakeWaiters: Map<string, number>
   logoutHandshakeVersion: number
@@ -81,4 +80,5 @@ export type State = {
   userActive: boolean
   username: string
   useNativeFrame: boolean
+  whatsNewLastSeenVersion: string
 }

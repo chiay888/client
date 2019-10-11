@@ -48,6 +48,7 @@ type ChatServiceHandler interface {
 	UnpinV1(context.Context, unpinOptionsV1) Reply
 	GetResetConvMembersV1(context.Context) Reply
 	AddResetConvMemberV1(context.Context, addResetConvMemberOptionsV1) Reply
+	GetDeviceInfoV1(context.Context, getDeviceInfoOptionsV1) Reply
 }
 
 // chatServiceHandler implements ChatServiceHandler.
@@ -279,6 +280,27 @@ func (c *chatServiceHandler) SetUnfurlSettingsV1(ctx context.Context, opts setUn
 		return c.errReply(err)
 	}
 	return Reply{Result: true}
+}
+
+
+func (c *chatServiceHandler) GetDeviceInfoV1(ctx context.Context, opts getDeviceInfoOptionsV1) Reply {
+	client, err := GetUserClient(c.G())
+	if err != nil {
+		return c.errReply(err)
+	}
+	uid, err := keybase1.UIDFromString(opts.Uid)
+	if err != nil {
+		return c.errReply(err)
+	}
+	arg := keybase1.LoadUserPlusKeysV2Arg{
+		Uid:        uid,
+		Oa:         keybase1.OfflineAvailability_BEST_EFFORT,
+	}
+	them, err := client.LoadUserPlusKeysV2(ctx, arg)
+	if err != nil {
+		return c.errReply(err)
+	}
+	return Reply{Result: them}
 }
 
 func (c *chatServiceHandler) getAdvertTyp(typ string) (chat1.BotCommandsAdvertisementTyp, error) {

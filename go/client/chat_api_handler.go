@@ -49,6 +49,7 @@ const (
 	methodUnpin               = "unpin"
 	methodGetResetConvMembers = "getresetconvmembers"
 	methodAddResetConvMember  = "addresetconvmember"
+	methodGetDeviceInfo       = "getdeviceinfo"
 )
 
 // ChatAPIHandler can handle all of the chat json api methods.
@@ -81,6 +82,7 @@ type ChatAPIHandler interface {
 	UnpinV1(context.Context, Call, io.Writer) error
 	GetResetConvMembersV1(context.Context, Call, io.Writer) error
 	AddResetConvMemberV1(context.Context, Call, io.Writer) error
+	GetDeviceInfoV1(context.Context, Call, io.Writer) error
 }
 
 // ChatAPI implements ChatAPIHandler and contains a ChatServiceHandler
@@ -541,6 +543,17 @@ func (o setUnfurlSettingsOptionsV1) Check() error {
 			method:  methodSetUnfurlSettings,
 			err:     errors.New("invalid unfurl mode"),
 		}
+	}
+	return nil
+}
+
+type getDeviceInfoOptionsV1 struct {
+	Uid      string `json:"uid"`
+}
+
+func (o getDeviceInfoOptionsV1) Check() error {
+	if len(o.Uid) == 0 {
+		return errors.New("uid required")
 	}
 	return nil
 }
@@ -1018,6 +1031,21 @@ func (a *ChatAPI) AddResetConvMemberV1(ctx context.Context, c Call, w io.Writer)
 		return err
 	}
 	return a.encodeReply(c, a.svcHandler.AddResetConvMemberV1(ctx, opts), w)
+}
+
+func (a *ChatAPI) GetDeviceInfoV1(ctx context.Context, c Call, w io.Writer) error {
+	if len(c.Params.Options) == 0 {
+		return ErrInvalidOptions{version: 1, method: methodGetDeviceInfo, err: errors.New("empty options")}
+	}
+	var opts getDeviceInfoOptionsV1
+	if err := json.Unmarshal(c.Params.Options, &opts); err != nil {
+		return err
+	}
+	fmt.Printf("opts are %+v\n", opts)
+	if err := opts.Check(); err != nil {
+		return err
+	}
+	return a.encodeReply(c, a.svcHandler.GetDeviceInfoV1(ctx, opts), w)
 }
 
 func (a *ChatAPI) encodeReply(call Call, reply Reply, w io.Writer) error {

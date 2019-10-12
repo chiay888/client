@@ -331,4 +331,21 @@ protocol api {
     array<ResetConvMemberAPI> members;
     array<RateLimitRes> rateLimits;
   }
+
+  record DeviceInfo {
+    @jsonkey("id")
+    string deviceID;
+    // DeviceID id;
+    @jsonkey("description")
+    string deviceDescription;
+    @jsonkey("type")
+    string deviceType;
+    @jsonkey("ctime")
+    int64 deviceCtime;
+    // Time ctime;
+  }
+
+  record GetDeviceInfoRes {
+    array<DeviceInfo> devices;
+  }
 }

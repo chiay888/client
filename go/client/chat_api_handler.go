@@ -1041,7 +1041,6 @@ func (a *ChatAPI) GetDeviceInfoV1(ctx context.Context, c Call, w io.Writer) erro
 	if err := json.Unmarshal(c.Params.Options, &opts); err != nil {
 		return err
 	}
-	fmt.Printf("opts are %+v\n", opts)
 	if err := opts.Check(); err != nil {
 		return err
 	}

@@ -300,7 +300,20 @@ func (c *chatServiceHandler) GetDeviceInfoV1(ctx context.Context, opts getDevice
 	if err != nil {
 		return c.errReply(err)
 	}
-	return Reply{Result: them}
+	var res chat1.GetDeviceInfoRes
+	for _, m := range them.Current.DeviceKeys {
+		dev := chat1.DeviceInfo{
+			DeviceID: string(m.DeviceID),
+			DeviceDescription: m.DeviceDescription,
+			DeviceType: m.DeviceType,
+			DeviceCtime: m.Base.CTime.UnixSeconds(),
+		}
+		if string(m.DeviceID) != "" && m.Base.Revocation == nil {
+			res.Devices = append(res.Devices, dev)
+		}
+	}
+
+	return Reply{Result: res}
 }
 
 func (c *chatServiceHandler) getAdvertTyp(typ string) (chat1.BotCommandsAdvertisementTyp, error) {
